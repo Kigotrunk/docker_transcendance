@@ -1,0 +1,117 @@
+.blured {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.5);
+	filter: blur(5px);
+	z-index: 9;
+	transition: all 0.3s;
+	display: none;
+}
+
+.phone-menu {
+	position: fixed;
+	top: 0;
+	left: -220px;
+	width: 220px;
+	height: 100%;
+	transition: all 0.3s;
+	background-color: var(--background);
+	z-index: 10;
+
+	display: flex;
+	flex-direction: column;
+}
+
+.phone-menu a {
+	height: 80px;
+	color: var(--text);
+	text-decoration: none;
+	border-bottom: 1px solid var(--text);
+	display: flex;
+	align-items: center;
+	transition: all 0.3s;
+}
+
+.phone-menu a:hover {
+	background-color: var(--primary);
+}
+
+.phone-menu a span {
+	margin-left: 16px;
+	font-size: 2.369rem;
+}
+
+.menu {
+	height: calc(100vh - 80px);
+	width: 64px;
+	background-color: var(--background);
+	box-shadow: inset 2px 2px 10px rgba(0, 0, 0, 0.1);
+	flex-direction: column;
+	align-items: center;
+	z-index: 1;
+}
+
+.menu a {
+	height: 64px;
+	width: 100%;
+	color: var(--text);
+	text-decoration: none;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	border-radius: 2px;
+	transition: all 0.1s;
+}
+
+.menu a:hover {
+	background-color: var(--primary);
+	color: white;
+}
+
+.menu span {
+	font-size: 28px;
+}
+
+.menu .active {
+	color: var(--primary);
+}
+
+.short-menu {
+	display: none;
+}
+
+.extanded-menu {
+	width: 200px !important;
+	display: none;
+}
+
+.extanded-menu a {
+	flex-direction: row !important;
+	justify-content: flex-start !important;
+}
+
+.extanded-menu .material-icons {
+	margin: 0px 16px !important;
+}
+
+@media only screen and (min-width: 768px) {
+	.short-menu {
+		display: flex;
+	}
+}
+
+@media only screen and (min-width: 1224px) {
+	.phone-menu {
+		display: none;
+	}
+}
+
+@media (prefers-color-scheme: dark) {
+    .menu {
+		box-shadow: 0px 0px 10px var(--primary);
+	}
+}

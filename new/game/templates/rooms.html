@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Select Room</title>
+</head>
+<body>
+    <h1>Select a Room</h1>
+    <ul id="room-list"></ul>
+    <input id="room-name-input" type="text" placeholder="Room name">
+    <button onclick="createRoom()">Create Room</button>
+    <button onclick="joinLocal()">Local Mode</button>
+
+    <script>
+        function fetchRooms() {
+            // Simulate API call to fetch room list
+            return ['room1', 'room2', 'room3'];
+        }
+
+        function displayRooms() {
+            const rooms = fetchRooms();
+            const roomList = document.getElementById('room-list');
+            roomList.innerHTML = '';
+            rooms.forEach(room => {
+                const li = document.createElement('li');
+                li.textContent = room;
+                li.onclick = () => joinRoom(room);
+                roomList.appendChild(li);
+            });
+        }
+
+        function joinRoom(roomName) {
+            window.location.href = `/game/${roomName}/`;
+        }
+
+        function createRoom() {
+            const roomName = document.getElementById('room-name-input').value;
+            if (roomName) {
+                joinRoom(roomName);
+            }
+        }
+
+        function joinLocal() {
+            window.location.href = `/game/local/`;
+        }
+
+        displayRooms();
+    </script>
+</body>
+</html>

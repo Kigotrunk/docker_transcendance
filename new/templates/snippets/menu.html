@@ -1,0 +1,25 @@
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/menu.css' %}" type="text/css">
+
+<div class="phone-menu">
+  <div style="width: 100%; height: 80px; background-color: black;"></div>
+  <a onclick="gameSection()"><span>Game</span></a>
+  <a onclick="showChatList()"><span>Chat</span></a>
+  <a href="{% url 'home' %}"><span>Settings</span></a>
+</div>
+
+<div class="blured"></div>
+
+<div style="display: flex; flex-direction: row; flex-grow: 1;">
+  <div class="menu short-menu">
+    <a onclick="gameSection()"><span class="material-icons">sports_esports</span></a>
+    <a onclick="showChatList()"><span class="material-icons">chat</span></a>
+    <a href="" style="margin-top: auto;"><span class="material-icons">logout</span></a>
+  </div>
+
+  <div class="menu extanded-menu">
+    <a onclick="gameSection()"><span class="material-icons">sports_esports</span><span>Game</span></a>
+    <a onclick="showChatList()"><span class="material-icons">chat</span><span>Chat</span></a>
+    <a href="" style="margin-top: auto;"><span class="material-icons">logout</span><span>Logout</span></a>
+  </div>

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Conversations</h2>
+
+<ul>
+    {% for conversation in conversations %}
+        <li>
+            {% if conversation.user1 == request.user %}
+                <a href="{% url 'chat_view' conversation.user1.username conversation.user2.username %}">
+                    Conversation with {{ conversation.user2.username }}
+                </a>
+            {% else %}
+                <a href="{% url 'chat_view' conversation.user2.username conversation.user1.username %}">
+                    Conversation with {{ conversation.user1.username }}
+                </a>
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

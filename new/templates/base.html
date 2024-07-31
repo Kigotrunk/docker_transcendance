@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Icons"
+      rel="stylesheet">
+      <link rel="stylesheet" href="{% static 'css/colors.css' %}" type="text/css">
+      <link rel="stylesheet" href="{% static 'css/chat.css' %}" type="text/css">
+      <link rel="stylesheet" href="{% static 'css/profile.css' %}" type="text/css">
+      <link rel="stylesheet" href="{% static 'css/game.css' %}" type="text/css">
+    <title>Transcendance</title>
+</head>
+<body>
+
+<!-- HEADER -->
+{% include 'snippets/header.html' %}
+
+<!-- MENU -->
+{% include 'snippets/menu.html' %}
+
+<!-- BODY -->
+<div class="content" style="flex-grow: 1;">
+    {% block content %}
+
+    {% endblock content %}
+</div>
+</div>
+
+<script src="{% static 'js/script.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/game-script.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/chat-script.js' %}" type="text/javascript"></script>
+{% block script %}{% endblock script %}
+
+</body>
+</html>

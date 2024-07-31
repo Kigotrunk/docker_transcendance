@@ -1,0 +1,16 @@
+.stats-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stats-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stats-label {
+    font-size: 1.3rem;
+}

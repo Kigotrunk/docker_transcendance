@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/chat.css' %}" type="text/css">
+
+<div class="chat-content">
+
+<div class="chat-list">
+
+{% for conversation, other_user in conversations_with_other_user %}
+	<a href="?conversation_id={{ conversation.id }}" class="chat-user">
+		<img src={{other_user.profile_picture.url}} alt="profile picture">
+		<h4>{{ other_user.username }}</h4>
+		<div class="overlay"></div>
+	</a>
+{% endfor %}
+
+</div>
+
+<div style="display: flex; flex-direction: column; justify-content: space-between; flex-grow: 1;">
+
+{% if selected_conversation %}
+	<div class="talk">
+		{% for message in messages %}
+			{% if message.issuer.username == user.username %}
+				<div class="message send">{{ message.message }}</div>
+			{% else  %}
+				<div class="message received">{{ message.message }}</div>
+			{% endif %}
+		{% endfor %}
+	</div>
+    <form method="POST">
+		{% csrf_token %}
+		{% for field in form %}
+		<div class="input">
+			{{ field }}
+			<button type="submit" class="send-button" disabled><span class="material-icons">send</span></button>
+		</div>
+		{% endfor %}
+	</form>
+{% endif %}
+
+</div>
+
+</div>
+
+{% endblock content %}
+
+{% block script %}
+<script src="{% static 'js/chat-script.js' %}"></script>
+{% endblock script %}

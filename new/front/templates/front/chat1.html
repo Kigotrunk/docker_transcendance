@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/chat.css' %}" type="text/css">
+
+<div class="chat-list">
+
+{% for conversation, other_user in conversations_with_other_user %}
+	<a href="?conversation_id={{ conversation.id }}" class="chat-user">
+		<img src="profile-picture.jpeg" alt="profile picture">
+		<div class="info">
+		<h4>Kenzo</h4>
+		<p>hello</p>
+		</div>
+		<div class="overlay"></div>
+	</a>
+{% endfor %}
+
+</div>
+
+<div style="display: flex; flex-direction: column; justify-content: space-between; flex-grow: 1;">
+
+{% if selected_conversation %}
+	<div class="talk">
+		<div class="message send">hello</div>
+		<div class="message received">hello</div>
+		{% for message in messages %}
+			<div class="message send">{{ message.message }}</div>
+		{% endfor %}
+	</div>
+	<div class="input">
+			<input type="text" placeholder="Type a message">
+			<button><span class="material-icons">send</span></button>
+	</div>
+
+</div>
+
+{% endblock content %}

@@ -1,0 +1,51 @@
+#game-container {
+	position: relative;
+	width: 800px;
+	height: 600px;
+	margin: 36px;
+	border: solid 4px var(--primary);
+}
+
+#pongCanvas {
+	display: block;
+	width: 100%;
+	height: 100%;
+	background-color: black;
+}
+
+#score {
+	position: absolute;
+	top: 10px;
+	width: 100%;
+	text-align: center;
+	font-size: 24px;
+	font-family: Arial, sans-serif;
+	color: white;
+}
+
+#pong-menu {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	background-color: transparent;
+	z-index: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 64px
+}
+
+#pong-menu button {
+	background-color: transparent;
+	font-size: 48px;
+	color: white;
+	border: none;
+}
+
+#pong-menu button:hover {
+	color: red;
+	cursor: pointer;
+}

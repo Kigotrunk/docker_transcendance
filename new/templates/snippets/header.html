@@ -1,0 +1,17 @@
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/header.css' %}" type="text/css">
+
+<div class="header">
+  <a class="btn-menu" onclick="showMenu()"><span class="material-icons">menu</span></a>
+  <a href="{% url 'home' %}" class="logo"><h3>PONG</h3></a>
+  <div class="search-bar">
+    <input type="text" placeholder="Search">
+    <button><span class="material-icons">search</span></button>
+  </div>
+  <a onclick="myProfile()" class="user">
+    <span> <img id="id_profile_links" data-toggle="dropdown" aria-haspopup="true"
+    aria-expanded="false" src="{{request.user.profile_picture.url}}" alt="profil logo" width="40" height="40"></span>
+    <span class="username">{{ user.username }}</span>
+  </a>
+</div>

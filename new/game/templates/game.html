@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pong Game</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        #game-container {
+            position: relative;
+            width: 800px;
+            height: 600px;
+        }
+        #pongCanvas {
+            border: 1px solid black;
+            display: block;
+        }
+        #score {
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            text-align: center;
+            font-size: 24px;
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="score">Waiting for players...</div>
+        <canvas id="pongCanvas" width="800" height="600"></canvas>
+    </div>
+    <script>
+        const roomName = window.location.pathname.split('/')[2];
+        const canvas = document.getElementById('pongCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreDiv = document.getElementById('score');
+        let player = null;
+        let localMode = roomName === 'local';
+        let gameStarted = false;
+
+        const chatSocket = new WebSocket(
+            'ws://' + window.location.host + `/ws/pong/${roomName}/`
+        );
+
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            console.log(data);
+            if ('player' in data) {
+                player = data['player'];
+            } else if ('countdown' in data) {
+                scoreDiv.innerText = data['countdown'];
+                if (data['countdown'] === "") {
+                    gameStarted = true;
+                    scoreDiv.innerText = "0 - 0";
+                }
+            } else if ('waiting' in data && data['waiting'] === false) {
+                // Mettre à jour l'affichage lorsque les deux joueurs sont connectés
+                scoreDiv.innerText = "0 - 0";
+            } else {
+                updateGameState(data);
+            }
+        };
+
+        chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+        document.addEventListener('keydown', function(event) {
+            if (!gameStarted) return;
+
+            if (localMode) {
+                // Local mode controls
+                if (event.key === 'w' || event.key === 'W') {
+                    movePaddle('left', -5);
+                } else if (event.key === 's' || event.key === 'S') {
+                    movePaddle('left', 5);
+                } else if (event.key === 'ArrowUp') {
+                    movePaddle('right', -5);
+                } else if (event.key === 'ArrowDown') {
+                    movePaddle('right', 5);
+                }
+            } else {
+                // Online mode controls
+                if (player === 'left' && (event.key === 'w' || event.key === 'W')) {
+                    movePaddle('left', -5);
+                } else if (player === 'left' && (event.key === 's' || event.key === 'S')) {
+                    movePaddle('left', 5);
+                } else if (player === 'right' && event.key === 'ArrowUp') {
+                    movePaddle('right', -5);
+                } else if (player === 'right' && event.key === 'ArrowDown') {
+                    movePaddle('right', 5);
+                }
+            }
+        });
+
+        function movePaddle(player, delta) {
+            chatSocket.send(JSON.stringify({
+                'action': 'move',
+                'player': player,
+                'delta': delta
+            }));
+        }
+
+        
+        function updateGameState(gameState) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBall(gameState.ball_position);
+            drawPaddle(gameState.paddle1_position, 10);
+            drawPaddle(gameState.paddle2_position, canvas.width - 20);
+            scoreDiv.innerText = `${gameState.score[0]} - ${gameState.score[1]}`;
+        }
+       
+    /*    
+        function updateGameState(gameState) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawBall(gameState.ball_position);
+        ctx.fillRect(0, gameState.paddle1_position + 40, 10, 80);
+        ctx.fillRect(790, gameState.paddle2_position + 40, 10, 80);
+        scoreDiv.innerText = ${gameState.score[0]} - ${gameState.score[1]};
+    }
+    */
+        function drawBall(position) {
+            ctx.beginPath();
+            ctx.arc(position[0] * 8, position[1] * 6, 10, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function drawPaddle(position, x) {
+            ctx.fillRect(x, position * 6 - 40, 10, 80);
+        }
+
+        chatSocket.onopen = function(e) {
+            chatSocket.send(JSON.stringify({ 'action': 'join' }));
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+.profile-content {
+	padding: 16px;
+    padding-top: 64px;
+	display: flex;
+	flex-direction: column;
+    align-items: center;
+    gap: 24px;
+	flex-grow: 1;
+}
+
+.card {
+    padding: 36px;
+    line-height: 0px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 30px;
+}
+
+.left-section {
+    height: 360px;
+    width: 360px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 36px;
+}
+
+.profile-picture img {
+    object-fit: cover;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+}
+
+.profile-picture .material-icons {
+    font-size: 40px;
+    color: white;
+}
+
+.profile-picture {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin-top: 24px;
+    border-radius: 50%;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.img-hover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200px;
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(0, 0, 0, 0.5);
+    opacity: 0;
+    z-index: 1;
+    transition: all 0.2s;
+    border-radius: 50%;
+}
+
+.img-hover:hover {
+    cursor: pointer;
+    opacity: 1;
+}
+
+.right-section {
+    width: 360px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.line {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+    margin-bottom: 24px;
+}
+
+.info {
+    width: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.info span {
+    font-size: 1.5rem;
+}
+
+@media only screen and (min-width: 1224px) {
+	.profile-content {
+        flex-direction: row;
+        align-items: normal;
+        justify-content: space-evenly;
+    }
+    .left-section {
+        min-width: 360px;
+        width: 30%;
+    }
+    .right-section {
+        height: 360px;
+        width: 40%;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    .card {
+        box-shadow: 0px 0px 10px var(--primary);
+    }
+    .profile-picture {
+        box-shadow: 0px 0px 10px var(--primary);
+    }
+}

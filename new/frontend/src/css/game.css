@@ -1,0 +1,227 @@
+#game-content {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+    align-items: center;
+    gap: 24px;
+}
+
+#lobby-state {
+	height: 36px;
+	text-align: center;
+	font-size: 24px;
+	margin-top: 36px;
+}
+
+#game-info {
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	gap: 24px;
+}
+
+.player-info {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+}
+
+.player-info img {
+	width: 100px;
+	height: 100px;
+}
+
+#game-container {
+	position: relative;
+	width: 800px;
+	height: 600px;
+	margin: 36px;
+	border: solid 4px var(--primary);
+	color: white;
+}
+
+#pongCanvas {
+	display: block;
+	width: 100%;
+	height: 100%;
+	background-color: black;
+}
+
+#score {
+	position: absolute;
+	top: 10px;
+	width: 100%;
+	text-align: center;
+	font-size: 24px;
+	font-family: Arial, sans-serif;
+	color: white;
+}
+
+#game-main-menu {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	background-color: transparent;
+	z-index: 1;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+
+#game-main-menu button {
+	width: 50%;
+	height: 50%;
+	background-color: transparent;
+	font-size: 48px;
+	color: white;
+	border: none;
+	transition: all 0.3s ease-in-out;
+}
+
+#game-main-menu button:hover {
+	background-color: #020024;
+	font-size: 52px;
+}
+
+.game-menu {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	background-color: transparent;
+	z-index: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 64px
+}
+
+#game-over {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	color: white;
+}
+
+#game-over span {
+	font-size: 64px;
+}
+
+#game-over .primary-btn {
+	font-size: 24px;
+	background-color: var(--primary);
+	color: white;
+
+}
+
+#game-over .secondary-btn {
+	font-size: 24px;
+	background-color: var(--secondary);
+	color: white;
+}
+
+.btn-back {
+	position: absolute;
+	top: 10px;
+	left: 10px;
+	font-size: medium;
+	background-color: transparent;
+	color: white;
+	border: none;
+}
+
+.btn-back:hover {
+	cursor: pointer;
+	color: var(--primary);
+}
+
+.cancel-btn {
+	padding: 10px 20px;
+	background-color: #020024;
+}
+
+.cancel-btn:hover {
+	cursor: pointer;
+	background-color: #100d52;
+}
+
+.join-btn {
+	padding: 10px 20px;
+	background-color: #3a31d8;
+	font-size: 24px;
+}
+
+.join-btn:hover {
+	cursor: pointer;
+	background-color: #4f47ff;
+}
+
+.cup-menu {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 24px;
+	padding: 100px;
+}
+
+.menu-queue-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	font-size: 24px;
+}
+
+.cup-tree {
+	height: 600px;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 64px;
+}
+
+.cup-round {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: space-around;
+	gap: 36px;
+}
+
+.cup-match {
+	width: 172px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	font-size: 24px;
+	gap: 24px;
+	text-overflow: ellipsis;
+    overflow: hidden;
+    display: block;
+    white-space: nowrap;
+}
+
+.cup-match div {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	padding: 8px;
+	margin: 8px 0px;
+	border: solid 2px var(--primary);
+}

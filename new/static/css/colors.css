@@ -1,0 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Gantari:ital,wght@0,100..900;1,100..900&display=swap');
+
+body {
+  font-family: "Gantari", sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  margin: 0;
+  color: var(--text);
+  background-color: var(--background);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 100vw;
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: "Gantari", sans-serif;
+  font-weight: 700;
+}
+
+html {font-size: 100%;} /* 16px */
+
+h1 {font-size: 4.210rem; /* 67.36px */}
+
+h2 {font-size: 3.158rem; /* 50.56px */}
+
+h3 {font-size: 2.369rem; /* 37.92px */}
+
+h4 {font-size: 1.777rem; /* 28.48px */}
+
+h5 {font-size: 1.333rem; /* 21.28px */}
+
+small {font-size: 0.750rem; /* 12px */}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --text: #040316;
+    --background: #fbfbfe;
+    --primary: #2f27ce;
+    --secondary: #dddbff;
+    --accent: #443dff;
+  }
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #eae9fc;
+    --background: #010104;
+    --primary: #3a31d8;
+    --secondary: #020024;
+    --accent: #0600c2;
+  }
+}

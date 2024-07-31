@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Chat</h2>
+    {% for conversation in conversations %}
+        <div class="conversation">
+            <h3>{{ conversation.sender.username }}</h3>
+            {% for message in conversation.messages %}
+                <div class="{% if message.issuer == user %}send{% else %}received{% endif %}">
+                    {{ message.message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+    <form method="POST" action="{% url 'chat' %}">
+        {% csrf_token %}
+        <input type="text" name="recipient_id" placeholder="Recipient ID" required>
+        <input type="text" name="content" placeholder="Type a message..." required>
+        <button type="submit">Send</button>
+    </form>
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+{% endblock %}

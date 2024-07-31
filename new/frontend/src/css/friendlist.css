@@ -1,0 +1,58 @@
+.friend-list {
+    position: relative;
+    width: 200px;
+    max-height: 240px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--neutral-300);
+}
+
+.friend {
+    width: 100%;
+    border-bottom: 1px solid var(--neutral-300);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    text-decoration: none;
+    color: var(--text);
+}
+
+.friend:hover {
+    background-color: var(--neutral-200);
+}
+
+.friend img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin: 8px;
+}
+
+.friend-list span {
+    font-size: 1.5rem;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: block;
+    white-space: nowrap;
+}
+
+.friend .connected {
+    border: 2px solid rgb(78, 196, 32);
+}
+
+.friend .disconnected {
+    border: 2px solid var(--neutral-200);
+}
+
+@media (prefers-color-scheme: dark) {
+    .friend .connected {
+        border-color: rgb(95, 255, 32);
+    }
+    .friend .disconnected {
+        border-color: var(--neutral-500);
+    }
+    .friend:hover {
+        background-color: var(--neutral-700);
+    }
+}
