@@ -23,10 +23,20 @@ const GameMenu = ({
     } else if (menuState === "ai") {
       return <VersusAiMenu joinRoom={joinRoom} setMenuState={setMenuState} />;
     } else if (menuState === "tournament") {
-      return <TournamentMenu joinRoom={joinRoom} setMenuState={setMenuState} />;
+      return (
+        <TournamentMenu
+          joinRoom={joinRoom}
+          setMenuState={setMenuState}
+          queueState={false}
+        />
+      );
     } else if (menuState === "duel") {
       return (
-        <WaitingDuelMenu joinRoom={joinRoom} setMenuState={setMenuState} />
+        <WaitingDuelMenu
+          joinRoom={joinRoom}
+          setMenuState={setMenuState}
+          queueState={false}
+        />
       );
     } else if (menuState === "cup-waiting") {
       return <div>Waiting for the next match</div>;
@@ -39,9 +49,31 @@ const GameMenu = ({
     } else if (menuState === "cup-winner") {
       return <div>Congratulations! You won the cup</div>;
     } else if (menuState === "match-result") {
-      return <GameResult gameResult={gameResult} setMenuState={setMenuState} />;
+      return (
+        <GameResult
+          gameResult={gameResult}
+          setMenuState={setMenuState}
+          joinRoom={joinRoom}
+        />
+      );
     } else if (menuState === "waiting-opponent") {
       return <div>Waiting for opponent...</div>;
+    } else if (menuState === "in-queue") {
+      return (
+        <WaitingDuelMenu
+          joinRoom={joinRoom}
+          setMenuState={setMenuState}
+          queueState={true}
+        />
+      );
+    } else if (menuState === "cup-queue") {
+      return (
+        <TournamentMenu
+          joinRoom={joinRoom}
+          setMenuState={setMenuState}
+          queueState={true}
+        />
+      );
     }
     return null;
   };

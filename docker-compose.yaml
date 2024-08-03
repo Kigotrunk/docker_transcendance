@@ -1,33 +1,69 @@
 version: '3.8'
 
 services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: new
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: kigo
+    ports:
+      - "5432:5432"
+    networks:
+      - transnetwork
+
   frontend:
     build:
       context: ./new/frontend
       dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
     depends_on:
       - backend
+      - redis
+    environment:
+      - NODE_ENV=development
+      - REDIS_URL=redis://redis:6379/0
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    networks:
+      - transnetwork
 
   backend:
     build:
       context: ./new
       dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
     depends_on:
       - db
-
-  db:
-    image: postgres:13
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./new:/app
     environment:
-      POSTGRES_DB: mydatabase
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
+      - DJANGO_SETTINGS_MODULE=new.settings
+    networks:
+      - transnetwork
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - transnetwork
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./cert:/etc/nginx/certificates
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - transnetwork
+
+networks:
+  transnetwork:
+    driver: bridge
 
 volumes:
   postgres_data:
-

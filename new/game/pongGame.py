@@ -26,20 +26,24 @@ class pongGame :
     def __del__(self):
         print("Destructor called")
 
-    async def launchGame(self, mode, diff, is_cup) :
+    async def launchGame(self, mode, diff, is_cup, pongConsumer) :
         self.game_task = None
         self.ball = ball(400, 300, 10)
         self.mode = mode 
         self.leftPad = pad(0, 260, 10, 80, self.ball, 2, None)
         self.diff = diff
+        self.rightConsumer = pongConsumer
         if mode == "Online" :
             self.rightPad = pad(790, 260, 10, 80, self.ball, 2, self.leftPad)
             self.player_number = 2
             await self.save_is_in_game(self.left_player)
             await self.save_is_in_game(self.right_player)
+            self.pongConsumer.in_lobby = True
+            self.rightConsumer.in_lobby = True
         elif mode == "LM" :
             await self.save_is_in_game(self.left_player)
             #self.leftPad = pad_ai(0, 260, 10, 80, self.ball, 2, None)
+            self.pongConsumer.in_lobby = True
             self.rightPad = pad_ai(790, 260, 10, 80, self.ball, diff, self.leftPad)
         self.score = [0, 0] 
         self.game_state = True
@@ -76,7 +80,9 @@ class pongGame :
                     'game_info': {
                         'type': 'game_info',
                         'left': self.left_player.id,
-                        'right': self.right_player.id
+                        'right': self.right_player.id,
+                        'left_username': self.left_player.username,
+                        'right_username': self.right_player.username,
                     }
                 }
             )
@@ -133,14 +139,11 @@ class pongGame :
                         self.score[0] = 5 
                 self.game_over = True
             await self.send_game_state()
-            await asyncio.sleep(0.01)
             if self.game_over == True:
                 if self.mode != "LM":
                     await self.save_game_result()
                 winner = self.left_player if self.score[0] == 5 else self.right_player
                 loser = self.left_player if self.score[0] != 5 else self.right_player
-                if self.tournament:
-                    await self.tournament.match_result(self.room_name, winner, loser)
                 if self.mode != "LM":
                     await self.send_game_result(winner, loser)
                     if self.is_cup == True :
@@ -148,17 +151,23 @@ class pongGame :
                     else :
                         await self.save_is_not_in_game(winner)
                         await self.save_is_not_in_game(loser)
-                del self.ball
-                if self.mode == "LM":
+                    self.pongConsumer.in_lobby = False
+                    self.rightConsumer.in_lobby = False
+                    if self.tournament:
+                        await self.tournament.match_result(self.room_name, winner, loser)
+                else :
                     await self.send_game_result(winner, loser)
                     if self.diff == 4 :
                         await self.save_survivor_score()
                     await self.save_is_not_in_game(self.left_player)
                     self.rightPad.algorithm.dedge = True
+                    self.pongConsumer.in_lobby = False
                     del self.rightPad.algorithm
                 del self.leftPad
                 del self.rightPad
+                del self.ball
                 break
+            await asyncio.sleep(0.01)
 
     def collisions(self ,ball, leftPad, rightPad):
         if (ball.y + ball.rad >= 600) or (ball.y - ball.rad <= 0) :
@@ -261,7 +270,8 @@ class pongGame :
                 'winner' : winner.id,
                 'winner_elo' : winner.elo,
                 'loser' : loser.id, 
-                'loser_elo' : loser.elo
+                'loser_elo' : loser.elo,
+                'score' : self.score
             }
         else:
             if self.mode == "Online":
@@ -270,12 +280,15 @@ class pongGame :
                     'winner' : winner.id,
                     'winner_elo' : winner.elo,
                     'loser' : loser.id, 
-                    'loser_elo' : loser.elo
+                    'loser_elo' : loser.elo,
+                    'score' : self.score
                 }
             else:
                     game_result = {
                         'mode' : "ia",
                         'win' : False if winner == None else True,
+                        'diff' : self.diff,
+                        'score' : f"{self.score[0]} - {self.score[1]}" if self.diff != 4 else self.rightPad.algorithm.surv_score,
                     }
 
         await self.pongConsumer.channel_layer.group_send(
@@ -333,7 +346,7 @@ class pongGame :
     async def update_player_stats(self, player_id, win, new_elo):
         
         player = await database_sync_to_async(Account.objects.get)(id=player_id)
-        
+
         if win:
             player.nb_win += 1
         else:
@@ -349,12 +362,12 @@ class pongGame :
 
         await database_sync_to_async(player.save)()
 
-        print(f"Player {player.username} : ")
-        print(f"Number of win(s) : {player.nb_win}")
-        print(f"Number of Loss(es) : {player.nb_loose}")
-        print(f"Number of games played : {player.nb_games}")
-        print(f"Player's new elo : {player.elo}")
-        print(f"Player's new coef : {player.coef}")
+        #print(f"Player {player.username} : ")
+        #print(f"Number of win(s) : {player.nb_win}")
+        #print(f"Number of Loss(es) : {player.nb_loose}")
+        #print(f"Number of games played : {player.nb_games}")
+        #print(f"Player's new elo : {player.elo}")
+        #print(f"Player's new coef : {player.coef}")
 
 async def matchmaking(queue):
 

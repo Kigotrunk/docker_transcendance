@@ -2,8 +2,8 @@ import React, { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../../AuthContext";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
-const WaitingDuelMenu = ({ joinRoom, setMenuState }) => {
-  const [inQueue, setInQueue] = useState(false);
+const WaitingDuelMenu = ({ joinRoom, setMenuState, queueState }) => {
+  const [inQueue, setInQueue] = useState(queueState);
   const { gameSocketRef } = useContext(AuthContext);
   const leaveQueue = () => {
     console.log("Leaving queue");
@@ -22,14 +22,6 @@ const WaitingDuelMenu = ({ joinRoom, setMenuState }) => {
       console.error("WebSocket is not open or not initialized");
     }
   };
-
-  useEffect(() => {
-    return () => {
-      if (inQueue) {
-        leaveQueue();
-      }
-    };
-  }, [inQueue]);
 
   return (
     <div className="cup-menu">
@@ -57,6 +49,7 @@ const WaitingDuelMenu = ({ joinRoom, setMenuState }) => {
         className="btn-back"
         onClick={() => {
           setMenuState("main");
+          leaveQueue();
         }}
       >
         <ArrowBackIcon fontSize="large" />

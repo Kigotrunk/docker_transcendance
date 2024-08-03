@@ -225,3 +225,28 @@
 	margin: 8px 0px;
 	border: solid 2px var(--primary);
 }
+
+.game-result {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	background-color: #100d52;
+	border-radius: 8px;
+	border: solid 2px var(--primary);
+	padding: 8px;
+}
+
+.result-users {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 24px;
+}
+
+.result-user {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+}

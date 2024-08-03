@@ -15,7 +15,7 @@ const History = ({ id }) => {
   const getHistory = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8000/api/history/${id}/?page=1`
+        `http://localhost:8000/game/history/${id}/?page=1`
       );
       setHistory(response.data.results);
     } catch (error) {
@@ -26,7 +26,7 @@ const History = ({ id }) => {
   const SeeMore = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8000/api/history/${id}/?page=${page + 1}`
+        `http://localhost:8000/game/history/${id}/?page=${page + 1}`
       );
       setHistory((prevHistory) => [...prevHistory, ...response.data.results]);
       setPage(page + 1);
@@ -65,6 +65,19 @@ const History = ({ id }) => {
 
   return (
     <div className="history">
+      <div>
+        In the last {history.length} games:{" "}
+        {
+          history.filter((game) => game.score_player1 > game.score_player2)
+            .length
+        }{" "}
+        wins,{" "}
+        {
+          history.filter((game) => game.score_player1 < game.score_player2)
+            .length
+        }{" "}
+        defeats
+      </div>
       {history.map((game, index) => (
         <Match key={index} game={game} />
       ))}

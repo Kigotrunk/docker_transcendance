@@ -12,6 +12,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from .consumers import PongConsumer
 
 """
 def player_history(request, player_name):
@@ -61,12 +62,9 @@ class GameUsers(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, user_id):
-        id_user = user_id
-        if not id_user:
-            return JsonResponse({'error': 'Missing id'}, status=400)
-        userhisto = get_object_or_404(Account, id=id_user)
+        userhistory = get_object_or_404(Account, id=user_id)
         try:
-            history = partie.objects.filter(Q(player1=userhisto) | Q(player2=userhisto)).order_by('-time') #[:10]
+            history = partie.objects.filter(Q(player1=userhistory) | Q(player2=userhistory)).order_by('-time') #[:10]
             paginator = PageNumberPagination()
             paginator.page_size = 10
             history_page = paginator.paginate_queryset(history, request)
@@ -75,8 +73,9 @@ class GameUsers(APIView):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=404)
 
-def rooms(request):
-    return render(request, 'rooms.html')
+class UserStatus(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
-def game(request, room_name):
-    return render(request, 'game.html', {'room_name': room_name})
+    def get(self, request):
+        return JsonResponse({"in_lobby": PongConsumer.in_lobby}, status=200)

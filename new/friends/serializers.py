@@ -6,7 +6,7 @@ from myaccount.models import Account
 class FriendSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
-        fields = ('id', 'username', 'email', 'hide_email', 'profile_picture', 'date_joined', 'last_login', 'is_active', 'is_in_game', 'nb_win', 'nb_loose', 'is_connected')
+        fields = ('id', 'username', 'profile_picture', 'is_in_game', 'is_connected')
 
 
 class InvitationSerializer(serializers.ModelSerializer):

@@ -54,6 +54,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
             except Account.DoesNotExist:
                 return
             
+            if receiver.id == issuer.id:
+                return
+            
             try:
                 user_block = await sync_to_async(UserBlock.objects.get)(
                     blocker=receiver,
@@ -100,8 +103,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'receiver': receiver_username
                 }
             )
-            if receiver.id == issuer.id:
-                return
             await self.channel_layer.group_send(
                 f'user_{issuer.id}',
                 {

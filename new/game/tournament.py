@@ -39,6 +39,7 @@ class tournament() :
         if self.player_count == self.max_players:
             await self.launchTournament()
         print(self.list_player)
+
     async def leavingPlayer(self, user, pongConsumer):
         i = 0
         to_remove = (user, pongConsumer)
@@ -46,6 +47,10 @@ class tournament() :
             i += 1
         self.player_count -= 1
         self.list_player.pop(i)
+        pongConsumer.in_queue_cup = False
+        if self.state == 0:
+            await self.sendLobbyState()
+
     async def launchTournament(self) :
         self.state = 1
         seeding = [0, 7, 5, 2, 3, 4, 6, 1]
@@ -54,6 +59,9 @@ class tournament() :
         for index, pos in enumerate(seeding):
             bracket_list[pos] = self.list_player[index]
         self.list_player = bracket_list
+        for user, pongConsumer in self.list_player :
+            pongConsumer.in_queue_cup = False
+            pongConsumer.in_cup = True
         await self.save_is_in_game_all()
         await self.create_room_cup()
 
@@ -133,7 +141,7 @@ class tournament() :
             consumer2.channel_name
             )
             self.rooms.append(room_name)
-            await room.launchGame("Online", 0, True) 
+            await room.launchGame("Online", 0, True, consumer2) 
             match_info = {
                 'player1': player1.username,
                 'player2': player2.username,
@@ -160,6 +168,7 @@ class tournament() :
             removeGame(room_name)
 
     async def match_result(self, room_name, winner, loser):
+        """
         await self.tournament_consumer.channel_layer.group_send(
             self.cup_group_name,
             {
@@ -167,10 +176,13 @@ class tournament() :
                 'cup_match_result': {
                     'type': 'cup_match_result',
                     'loser' : loser.id,
+                    'loser_username' : loser.username,
                     'winner' : winner.id,
+                    'winner_username' : winner.username,
                 }
             }
         )
+        """
         for user, pongConsumer in self.list_player:
             if user == loser:
                 await pongConsumer.lost_cup()
@@ -202,6 +214,13 @@ class tournament() :
                     }
                 }
             )
+            for user, pongConsumer in self.list_player:
+                if user == winner:
+                    pongConsumer.in_cup = False
+                    await pongConsumer.channel_layer.group_discard(
+                        pongConsumer.cup_group_name,
+                        pongConsumer.channel_name 
+                    )
             await self.save_is_not_in_game_winner(winner)
             await self.save_winner_place(winner)
         del self
@@ -230,7 +249,7 @@ class tournament() :
             consumer2.channel_name
             )
             self.rooms.append(room_name)
-            await room.launchGame("Online", 0, True) 
+            await room.launchGame("Online", 0, True, consumer2) 
             match_info = {
                 'player1': player1.username,
                 'player2': player2.username,
@@ -264,7 +283,7 @@ class tournament() :
             consumer2.channel_name
             )
             self.rooms.append(room_name)
-            await room.launchGame("Online", 0, True) 
+            await room.launchGame("Online", 0, True, consumer2) 
             match_info = {
                 'player1': player1.username,
                 'player2': player2.username,

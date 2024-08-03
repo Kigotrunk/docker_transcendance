@@ -5,7 +5,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const ProfileEdit = () => {
-  const { user, refreshUser } = useContext(AuthContext);
+  const { user, refreshUser, gameSocketRef } = useContext(AuthContext);
   const navigate = useNavigate();
   const [username, setUsername] = useState(user.username);
   const [usernameError, setUsernameError] = useState("");
@@ -30,6 +30,11 @@ const ProfileEdit = () => {
         }
       );
       await refreshUser();
+      if (gameSocketRef.current) {
+        gameSocketRef.current.send(
+          JSON.stringify({ action: "update_user", user: username })
+        );
+      }
       navigate(`/profile/${user.id}`);
     } catch (error) {
       console.error(error);

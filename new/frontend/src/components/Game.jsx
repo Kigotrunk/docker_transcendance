@@ -43,6 +43,10 @@ const PongGame = () => {
         setMatchList(data["matches"]);
       } else if (data["in_lobby"]) {
         setGameStarted(true);
+      } else if (data["in_queue"]) {
+        setMenuState("in-queue");
+      } else if (data["in_queue_cup"]) {
+        setMenuState("cup-queue");
       } else if (invite) {
         joinRoom("pvp", invite);
         setMenuState("waiting-opponent");
@@ -60,22 +64,22 @@ const PongGame = () => {
         setGameStarted(true);
       }
     } else if (data["type"] === "tournament_state") {
-      if (data["state"] == 1) {
-        setMenuState("cup-waiting");
-      }
+      setMenuState("cup-waiting");
       setMatchList(data["matches"]);
     } else if (data["type"] === "game_info") {
-      getPlayerProfile(data["left"], "left");
-      getPlayerProfile(data["right"], "right");
+      getPlayerProfile(data["left"], "left", data["left_username"]);
+      getPlayerProfile(data["right"], "right", data["right_username"]);
     } else if (data["type"] === "game_result") {
       setGameResult(data["game_result"]);
+      setMenuState("match-result");
     }
   };
 
-  const getPlayerProfile = async (id, side) => {
+  const getPlayerProfile = async (id, side, username) => {
     const response = await axios.get(
       `http://localhost:8000/api/profile/${id}/`
     );
+    response.data["username"] = username;
     if (side === "left") {
       setLeftPlayer(response.data);
     }
@@ -163,7 +167,6 @@ const PongGame = () => {
     }
     if ("game_over" in gameState && gameState["game_over"]) {
       setGameStarted(false);
-      setMenuState("match-result");
       setLeftPlayer(null);
       setRightPlayer(null);
     }
@@ -191,6 +194,9 @@ const PongGame = () => {
     const ctx = canvasRef.current.getContext("2d");
     ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
     setScore("");
+    if (menuState === "main") {
+      setMatchList([]);
+    }
   }, [menuState]);
 
   return (

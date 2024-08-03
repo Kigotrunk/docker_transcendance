@@ -2,8 +2,8 @@ import React, { useState, useContext, useEffect } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { AuthContext } from "../../AuthContext";
 
-const TournamentMenu = ({ joinRoom, setMenuState }) => {
-  const [inQueue, setInQueue] = useState(false);
+const TournamentMenu = ({ joinRoom, setMenuState, queueState }) => {
+  const [inQueue, setInQueue] = useState(queueState);
   const { gameSocketRef } = useContext(AuthContext);
 
   const leaveQueue = () => {
@@ -23,15 +23,6 @@ const TournamentMenu = ({ joinRoom, setMenuState }) => {
       console.error("WebSocket is not open or not initialized");
     }
   };
-  /*
-  useEffect(() => {
-    return () => {
-      if (inQueue) {
-        leaveQueue();
-      }
-    };
-  }, [inQueue]);
-*/
 
   return (
     <div className="cup-menu">
@@ -59,6 +50,7 @@ const TournamentMenu = ({ joinRoom, setMenuState }) => {
         className="btn-back"
         onClick={() => {
           setMenuState("main");
+          leaveQueue();
         }}
       >
         <ArrowBackIcon fontSize="large" />

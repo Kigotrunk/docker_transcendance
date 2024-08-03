@@ -8,6 +8,7 @@ from .globals import setGame, getGame, removeGame, setCups, getCup, removeCup
 from .pongGame import pongGame, matchmaking
 from channels.db import database_sync_to_async
 from .tournament import tournament
+from myaccount.models import Account
 
 queue = []
 nb_room = 0
@@ -27,7 +28,9 @@ class PongConsumer(AsyncWebsocketConsumer):
         self.player_side = None
         self.in_lobby = False
         self.in_cup = False
-        self.in_game = False
+        self.in_queue_cup = False
+        self.in_queue = False
+    
         if self.user in connected_users:
             await self.close()
         else :
@@ -39,28 +42,15 @@ class PongConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
 
         global matchmaking_task
-        if self.in_cup != False:
-            if self.cup.state == 0:
-                await self.cup.leavingPlayer(self.user, self)
-            if self.cup.state > 0:
-                if self.room.left_player == self.user:
-                    self.room.score[1] = 5
-                    self.room.game_over = True
-                elif self.room.right_player == self.user:
-                    self.room.score[0] = 5
-                    self.room.game_over = True
-            self.cup = None
-            self.cup_group_name = None
-            self.in_cup = False
-            self.room = None
-            self.room_name = None
-            self.player_side = None
-            self.in_lobby = False
-        if self.room_name:
-            await self.channel_layer.group_discard(
-                self.room_group_name,
-                self.channel_name
-            )
+        if self.in_queue_cup == True :
+            await self.cup.leavingPlayer(self.user, self)
+        if self.in_lobby == True : 
+            if self.room.left_player == self.user:
+                self.room.score[1] = 5
+                self.room.game_over = True
+            elif self.room.right_player == self.user:
+                self.room.score[0] = 5
+                self.room.game_over = True
             if self.room:
                 if self.player_side == 'left' and self.room.right_player == None: #CHECK A DROITE YA QUELQUUN 
                     self.room.left_player = None
@@ -90,56 +80,65 @@ class PongConsumer(AsyncWebsocketConsumer):
             matchmaking_task.cancel()
             matchmaking_task = None
 
+        if self.user:
+            player_id = self.user.id
+            await self.force_save(player_id)
+
+    async def force_save(self, player_id):
+        player = await database_sync_to_async(Account.objects.get)(id=player_id)
+        await database_sync_to_async(player.save)()
+
     async def receive(self, text_data):
         data = json.loads(text_data)
         print(data)
         action = data.get('action')
         print(action)
-        if action == 'join':
-            mode = data.get('mode')
-            room_name = data.get('room')
-            
-            print(mode)
-            print(room_name)
-            if mode == 'pvp':
-                self.in_lobby = False
-                if room_name == "matchmaking":
-                    global nb_room
-                    global matchmaking_task
-                    nb_room += 1
-                    await self.add_player_to_queue()
-                    if matchmaking_task is None or matchmaking_task.done():
-                        matchmaking_task = asyncio.create_task(matchmaking(queue))
-                elif room_name[:4] != "room" and room_name != "cup":
-                    self.room_name = room_name.replace(" ", "")
-                    if int(self.room_name.split("-")[0]) != self.user.id and int(self.room_name.split("-")[1]) != self.user.id:
-                        print("Invalid room name")
-                        return
-                    self.room = getGame(self.room_name)
-                    self.room_group_name = f"game_{self.room_name}"
-                    
-                    if self.room is None:
-                        await self.create_room()
-                    else:
-                        await self.join_existing_room()
-                elif room_name == "cup":
-                    i = 0
-                    while not self.in_cup:
-                        self.cup_name = f"{i}cup"
-                        self.cup = getCup(self.cup_name)
-                        self.cup_group_name = f"game_{self.cup_name}"
-                        if self.cup is None:
-                            await self.create_cup(i)
-                        else:
-                            if self.cup.player_count < 8:
-                                await self.join_existing_cup()
-                        i += 1
-                else:
-                    print("Invalid room name")
-                    
-            elif mode == 'ai':
-                await self.setup_ai_game(data.get('room'))
+        if action == 'join' : 
+            if self.in_queue == False and self.in_queue_cup == False and self.in_cup == False and self.in_lobby == False :
+                mode = data.get('mode')
+                room_name = data.get('room')
                 
+                print(mode)
+                print(room_name)
+                if mode == 'pvp':
+                    self.in_lobby = False
+                    if room_name == "matchmaking":
+                        global nb_room
+                        global matchmaking_task
+                        nb_room += 1
+                        await self.add_player_to_queue()
+                        if matchmaking_task is None or matchmaking_task.done():
+                            matchmaking_task = asyncio.create_task(matchmaking(queue))
+                    elif room_name[:4] != "room" and room_name != "cup":
+                        self.room_name = room_name.replace(" ", "")
+                        if int(self.room_name.split("-")[0]) != self.user.id and int(self.room_name.split("-")[1]) != self.user.id:
+                            print("Invalid room name")
+                            return
+                        self.room = getGame(self.room_name)
+                        self.room_group_name = f"game_{self.room_name}"
+                        
+                        if self.room is None:
+                            await self.create_room()
+                        else:
+                            await self.join_existing_room()
+                    elif room_name == "cup":
+                        i = 0
+                        while not self.in_queue_cup:
+                            self.cup_name = f"{i}cup"
+                            self.cup = getCup(self.cup_name)
+                            self.cup_group_name = f"game_{self.cup_name}"
+                            if self.cup is None:
+                                await self.create_cup(i)
+                            else:
+                                if self.cup.player_count < 8:
+                                    await self.join_existing_cup()
+                            i += 1
+                    else:
+                        print("Invalid room name")
+                        
+                elif mode == 'ai':
+                    await self.setup_ai_game(data.get('room'))
+                    
         elif action == 'move' and self.room and not self.room.game_over:
             if self.room.game_state:
                 direction = data.get('direction')
@@ -153,34 +152,46 @@ class PongConsumer(AsyncWebsocketConsumer):
             await self.leave_queue()
 
         elif action == 'leave_cup':
-            if self.in_cup == True:
-                print("YO") 
-                await self.cup.leavingPlayer(self.user, self) 
+            if self.in_queue_cup == True:
+                print("YO")
+                await self.channel_layer.group_discard(
+                    self.cup_group_name,
+                    self.channel_name
+                )
+                await self.cup.leavingPlayer(self.user, self)
                 self.cup = None
                 self.cup_group_name = None
-            self.in_cup = False
+            self.in_queue_cup = False
 
+        elif action == 'update_user':
+            username = data.get('user')
+            if self.in_cup == False :
+                 self.user.username = username
         elif action == 'status':
             await self.send(text_data=json.dumps({
                 'type': 'status',
                 'in_lobby': self.in_lobby,
                 'in_cup': self.in_cup,
-                'matches' : self.cup.all_rounds if self.in_cup != False else None
+                'matches' : self.cup.all_rounds if self.in_cup != False else None,
+                'in_queue': self.in_queue,
+                'in_queue_cup': self.in_queue_cup,
             }))
             if self.in_lobby and self.room:
                 await self.send(text_data=json.dumps({
                     'type': 'game_info',
                     'left': self.room.left_player.id if self.room.left_player else None,
                     'right': self.room.right_player.id if self.room.right_player else None,
+                    'left_username': self.room.left_player.username if self.room.left_player else None,
+                    'right_username': self.room.right_player.username if self.room.right_player else None,
                 }))
 
-    async def lost_cup(self):        
+    async def lost_cup(self):
+        await self.channel_layer.group_discard(
+            self.cup_group_name,
+            self.channel_name
+        )
         self.cup_group_name = None
-        self.room_name = None
         self.cup = None
-        self.player_side = None
-        self.in_lobby = False
-        self.room_group_name = None
         self.in_cup = False
 
     async def leave_queue(self):
@@ -195,6 +206,7 @@ class PongConsumer(AsyncWebsocketConsumer):
             if not queue and matchmaking_task and not matchmaking_task.done():
                 matchmaking_task.cancel()
                 matchmaking_task = None
+            self.in_queue = False
 
     async def game_info(self, event):
         game_info = event['game_info']
@@ -237,7 +249,7 @@ class PongConsumer(AsyncWebsocketConsumer):
         self.room = pongGame(self.room_name, self)
         setGame(self.room_name, self.room)
         self.room.left_player = self.user
-        self.in_lobby = True
+        #self.in_lobby = True
         
     async def create_cup(self, i=None):
         await self.channel_layer.group_add(
@@ -246,7 +258,9 @@ class PongConsumer(AsyncWebsocketConsumer):
         )
         self.cup = tournament(self.user, self, self.cup_name)
         setCups(self.cup_name, self.cup)
-        self.in_cup = True
+        self.in_queue_cup = True
+        await self.cup.sendLobbyState()
+
 
     async def join_existing_cup(self):
         await self.channel_layer.group_add(
@@ -254,9 +268,11 @@ class PongConsumer(AsyncWebsocketConsumer):
             self.channel_name
         )
         await self.cup.newContestant(self.user, self)
-        self.in_cup = True
-    
+        self.in_queue_cup = True 
+        
     async def join_existing_room(self):
+        if self.room.left_player == self.user:
+            return
         if self.room.player_number == 1:
             await self.channel_layer.group_add(
                 self.room_group_name,
@@ -264,8 +280,8 @@ class PongConsumer(AsyncWebsocketConsumer):
             )
             self.player_side = 'right'
             self.room.right_player = self.user
-            await self.room.launchGame("Online", 0, False)
-            self.in_lobby = True
+            await self.room.launchGame("Online", 0, False, self)
+            #self.in_lobby = True
 
     async def setup_ai_game(self, diff):
         self.diff = diff
@@ -283,13 +299,15 @@ class PongConsumer(AsyncWebsocketConsumer):
         self.room = pongGame(self.room_name, self)
         setGame(self.room_name, self.room)
         self.room.left_player = self.user
-        await self.room.launchGame("LM", self.diff, False)
+        await self.room.launchGame("LM", self.diff, False, None)
     
     async def add_player_to_queue(self):
         
         print('Adding player to queue...')
         self.wait_time = time.time()
         queue.append(self)
+        self.in_queue = True
+        print(self.in_queue)
         print(f'player : {self.user}')
         print(f'Is player authenticated : {self.user.is_authenticated}')
         print(f'player\'s id : {self.user.id if self.user else "No ID"}')
@@ -316,6 +334,7 @@ class PongConsumer(AsyncWebsocketConsumer):
         else:
             print('player2 joining room...')
             await self.join_existing_room()
+        self.in_queue = False
     
     @database_sync_to_async
     def save_user(self, user):

@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { AuthContext } from "../AuthContext";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
+import '../css/login.css';
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -30,7 +31,7 @@ const Login = () => {
   return (
     <div>
       <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
+      <form className="register-form" onSubmit={handleSubmit}>
         <div>
           <label>Username:</label>
           <input

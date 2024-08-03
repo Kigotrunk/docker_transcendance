@@ -32,7 +32,11 @@ class SendInvitationView(APIView):
         receiver = get_object_or_404(Account, id=receiver_id)
         if Invitation.objects.filter(sender=user, receiver=receiver).exists():
             return Response({"error": "Invitation already sent"}, status=status.HTTP_400_BAD_REQUEST)
-
+        
+        if Invitation.objects.filter(sender=receiver, receiver=user).exists():
+            Friend.objects.create(user=user, friend=receiver)
+            Invitation.objects.filter(sender=receiver, receiver=user).delete()
+            return Response({"detail": "Friend add successfully"}, status=status.HTTP_201_CREATED)
         Invitation.objects.create(sender=user, receiver=receiver)
         return Response({"detail": "Invitation sent successfully"}, status=status.HTTP_201_CREATED)
 

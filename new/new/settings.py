@@ -122,6 +122,8 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 
+
+
 # Allow requests from localhost:3000 (React dev server)
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
@@ -162,20 +164,21 @@ CHANNEL_LAYERS = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',  # Le moteur de base de données que vous utilisez
-        'NAME': 'new',    # Nom de la base de données
-        'USER': 'postgres',                # Nom d'utilisateur de la base de données
-        'PASSWORD': 'kigo',          # Mot de passe de la base de données
-        'HOST': 'localhost',                        # Hôte de la base de données (par défaut : 'localhost')
-        'PORT': '5432',                                 # Port de la base de données (par défaut : '')
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'new',
+        'USER': 'postgres',
+        'PASSWORD': 'kigo',
+        'HOST': 'db',
+        'PORT': '5432',
     }
 }
+
 
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            'hosts': [('localhost', 6379)],
+            'hosts': [('redis', 6379)],
         },
     },
 }

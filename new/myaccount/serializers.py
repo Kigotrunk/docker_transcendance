@@ -6,7 +6,7 @@ from chat.models import Conversation, PrivateMessage
 class AccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
-        fields = ('id', 'username', 'email', 'hide_email', 'profile_picture', 'date_joined', 'last_login', 'nb_win', 'nb_loose', 'elo', 'nb_top8', 'nb_top4', 'nb_top2', 'nb_top1', 'highest_score')
+        fields = ('id', 'username', 'profile_picture', 'nb_win', 'nb_loose', 'elo', 'nb_top8', 'nb_top4', 'nb_top2', 'nb_top1', 'highest_score')
 
 
 class PrivateMessageCreateSerializer(serializers.ModelSerializer):
